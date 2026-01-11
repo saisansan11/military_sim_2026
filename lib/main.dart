@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'prc624_screen.dart';
 
 void main() {
   runApp(const MilitaryApp());
@@ -63,10 +64,9 @@ class MainMenuScreen extends StatelessWidget {
               icon: Icons.radio,
               onPressed: () {
                 // เดี๋ยวเราจะมาทำหน้าจำลองวิทยุกันต่อในขั้นหน้าครับ
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Loading PRC-624 Simulation...'),
-                  ),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Prc624Screen()),
                 );
               },
             ),
