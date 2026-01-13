@@ -1,128 +1,162 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'prc624_screen.dart';
+import 'prc624_menu.dart'; // Import เมนูย่อยที่เราทำไว้
 
 void main() {
-  runApp(const MilitaryApp());
+  runApp(const MilitarySimApp());
 }
 
-class MilitaryApp extends StatelessWidget {
-  const MilitaryApp({super.key});
+class MilitarySimApp extends StatelessWidget {
+  const MilitarySimApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'EW Training Simulator',
       debugShowCheckedModeBanner: false,
+      title: 'Military Sim',
       theme: ThemeData(
         brightness: Brightness.dark,
-        primaryColor: const Color(0xFF00FF41), // สีเขียว Terminal
-        scaffoldBackgroundColor: const Color(0xFF111111), // สีดำด้าน
+        primaryColor: Colors.black,
+        scaffoldBackgroundColor: const Color(0xFF121212),
         useMaterial3: true,
       ),
-      home: const MainMenuScreen(),
+      home: const ToolListScreen(),
     );
   }
 }
 
-class MainMenuScreen extends StatelessWidget {
-  const MainMenuScreen({super.key});
+class ToolListScreen extends StatelessWidget {
+  const ToolListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EW TRAINING SUITE'),
-        centerTitle: true,
+        title: Text(
+          "MILITARY TRAINING",
+          style: GoogleFonts.blackOpsOne(color: const Color(0xFF00FF41)),
+        ),
         backgroundColor: Colors.black,
-        titleTextStyle: GoogleFonts.blackOpsOne(
-          fontSize: 24,
-          color: const Color(0xFF00FF41),
-          letterSpacing: 2.0,
-        ),
+        centerTitle: true,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.radar, size: 100, color: Color(0xFF00FF41)),
-            const SizedBox(height: 40),
-            Text(
-              'SELECT EQUIPMENT',
-              style: GoogleFonts.orbitron(
-                fontSize: 18,
-                color: Colors.white70,
-                letterSpacing: 1.5,
-              ),
-            ),
-            const SizedBox(height: 20),
-            // ปุ่มเลือกวิทยุ PRC-624
-            _buildTacticalButton(
-              context,
-              label: "PRC-624",
-              subtitle: "VHF/FM Handheld Radio",
-              icon: Icons.radio,
-              onPressed: () {
-                // เดี๋ยวเราจะมาทำหน้าจำลองวิทยุกันต่อในขั้นหน้าครับ
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Prc624Screen()),
-                );
-              },
-            ),
-            const SizedBox(height: 15),
-            // ปุ่มวิทยุรุ่นอื่น (ปิดไว้ก่อน)
-            _buildTacticalButton(
-              context,
-              label: "PRC-77",
-              subtitle: "LOCKED",
-              icon: Icons.lock_outline,
-              isLocked: true,
-              onPressed: () {},
-            ),
-          ],
-        ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // การ์ดรายการเครื่องมือ PRC-624
+          _buildToolCard(
+            context,
+            title: "AN/PRC-624",
+            subtitle: "Handheld VHF/FM Radio",
+            imagePath: 'assets/images/prc624_real.png',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Prc624MenuScreen(),
+                ),
+              );
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // ตัวอย่างเครื่องมืออื่น (ล็อคไว้)
+          _buildToolCard(
+            context,
+            title: "AN/PRC-77 (Coming Soon)",
+            subtitle: "Manpack Radio",
+            isLocked: true,
+            onTap: () {},
+          ),
+        ],
       ),
     );
   }
 
-  // ฟังก์ชันสร้างปุ่มกดสไตล์ทหาร
-  Widget _buildTacticalButton(
+  // ฟังก์ชันสร้างการ์ด (แก้ไขใส่ Expanded ให้แล้ว)
+  Widget _buildToolCard(
     BuildContext context, {
-    required String label,
+    required String title,
     required String subtitle,
-    required IconData icon,
-    required VoidCallback onPressed,
+    String? imagePath,
+    required VoidCallback onTap,
     bool isLocked = false,
   }) {
-    return Container(
-      width: 300,
-      decoration: BoxDecoration(
-        border: Border.all(
+    return Card(
+      color: Colors.grey[900],
+      shape: RoundedRectangleBorder(
+        side: BorderSide(
           color: isLocked ? Colors.grey : const Color(0xFF00FF41),
+          width: 1,
         ),
-        borderRadius: BorderRadius.circular(8),
-        color: isLocked ? Colors.white10 : Colors.black,
+        borderRadius: BorderRadius.circular(10),
       ),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: isLocked ? Colors.grey : const Color(0xFF00FF41),
-          size: 30,
-        ),
-        title: Text(
-          label,
-          style: GoogleFonts.orbitron(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: isLocked ? Colors.grey : Colors.white,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              // ส่วนไอคอน/รูปภาพด้านซ้าย
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isLocked ? Colors.grey : const Color(0xFF00FF41),
+                  ),
+                ),
+                child: isLocked
+                    ? const Icon(Icons.lock, color: Colors.grey)
+                    : (imagePath != null
+                          ? Padding(
+                              padding: const EdgeInsets.all(1),
+                              child: Image.asset(
+                                imagePath,
+                                fit: BoxFit.contain,
+                              ),
+                            )
+                          : const Icon(Icons.radio, color: Color(0xFF00FF41))),
+              ),
+              const SizedBox(width: 16),
+
+              // ✅ ส่วนข้อความ (ใส่ Expanded เพื่อป้องกันข้อความทะลุจอ)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.blackOpsOne(
+                        fontSize: 18,
+                        color: isLocked ? Colors.grey : Colors.white,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.sarabun(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              // ลูกศรขวาสุด
+              Icon(
+                Icons.arrow_forward_ios,
+                color: isLocked ? Colors.grey : const Color(0xFF00FF41),
+                size: 16,
+              ),
+            ],
           ),
         ),
-        subtitle: Text(
-          subtitle,
-          style: TextStyle(color: isLocked ? Colors.white24 : Colors.white54),
-        ),
-        onTap: onPressed,
       ),
     );
   }

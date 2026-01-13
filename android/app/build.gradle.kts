@@ -24,7 +24,10 @@ android {
         applicationId = "com.example.military_sim"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        
+        // 🔴 จุดสำคัญ: แก้เป็น 21 เพื่อให้รองรับ 3D Model Viewer
+        minSdk = flutter.minSdkVersion 
+        
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
