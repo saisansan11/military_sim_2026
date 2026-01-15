@@ -286,9 +286,9 @@ class _Prc624TroubleScreenState extends State<Prc624TroubleScreen> {
 
                   Color borderColor = Colors.grey[700]!;
                   if (answered) {
-                    if (isCorrectAnswer)
+                    if (isCorrectAnswer) {
                       borderColor = Colors.green;
-                    else if (isSelected)
+                    } else if (isSelected)
                       borderColor = Colors.red;
                   }
 

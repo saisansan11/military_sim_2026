@@ -10,17 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
-  # ไอคอนมาตรฐาน
   cupertino_icons: ^1.0.8
-  
-  # ฟอนต์สวยๆ
   google_fonts: ^7.0.0
-  
-  # ระบบเสียง
   audioplayers: ^6.5.1
-  
-  # ระบบแสดงผล 3D (เพิ่มใหม่)
   model_viewer_plus: ^1.7.0
 
 dev_dependencies:
@@ -31,8 +23,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # ลงทะเบียน Assets ทั้งหมด
   assets:
-    - assets/sounds/   # เสียง
-    - assets/images/   # รูปภาพ
-    - assets/models/   # โมเดล 3D (เพิ่มใหม่)
+    - assets/sounds/
+    - assets/images/
+    - assets/models/prc624.glb
+    - assets/models/body.glb
+    - assets/models/antenna_base.glb
+    - assets/models/antenna_whip.glb
+    - assets/models/battery.glb
+    # ⚠️ ปิดส่วนของ 710 ไว้ก่อนจนกว่าจะได้ไฟล์จริงมาวางในโฟลเดอร์
+    # - assets/models/prc710.glb
+    # - assets/models/rt710g_body.glb
+    # - assets/models/tli718_bat.glb
