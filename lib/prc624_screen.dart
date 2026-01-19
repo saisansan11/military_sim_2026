@@ -11,9 +11,16 @@ class Prc624Screen extends StatefulWidget {
 }
 
 class _Prc624ScreenState extends State<Prc624Screen> {
+  // --- 0. พิกัดฐานข้อมูล (GitHub URL) ---
+  // ใช้ลิงก์นี้เพื่อระบุตำแหน่งไฟล์บนเว็บให้แม่นยำ 100%
+  final String ghBase =
+      "https://saisansan11.github.io/military_sim_2026/assets/";
+
   // --- 1. ระบบเสียง ---
   final AudioPlayer _staticPlayer = AudioPlayer();
   final AudioPlayer _effectPlayer = AudioPlayer();
+
+  // ระบุ path ต่อท้าย (ไม่ต้องแก้)
   final String soundSwitch = "sounds/switch.mp3";
   final String soundBeep = "sounds/beep.mp3";
   final String soundStatic = "sounds/static.mp3";
@@ -54,7 +61,8 @@ class _Prc624ScreenState extends State<Prc624Screen> {
       } else {
         await player.setReleaseMode(ReleaseMode.stop);
       }
-      await player.play(AssetSource(path));
+      // ✅ แก้ไข: ใช้ UrlSource ดึงเสียงจาก GitHub โดยตรง
+      await player.play(UrlSource("$ghBase$path"));
     } catch (e) {
       debugPrint("Audio Error: $e");
     }
@@ -180,10 +188,23 @@ class _Prc624ScreenState extends State<Prc624Screen> {
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: Image.asset(
-                      'assets/images/prc624_real.png',
+                    // ✅ แก้ไข: ใช้ Image.network ดึงรูปจาก GitHub โดยตรง
+                    child: Image.network(
+                      '${ghBase}images/prc624_real.png',
                       fit: BoxFit.cover,
                       alignment: Alignment.center,
+                      errorBuilder: (context, error, stackTrace) {
+                        // กันเหนียว: ถ้าโหลดไม่ได้ ให้แสดงหน้าจอสีเทาแทน
+                        return Container(
+                          color: Colors.grey[900],
+                          child: const Center(
+                            child: Text(
+                              "Image Load Error",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                   Positioned(
