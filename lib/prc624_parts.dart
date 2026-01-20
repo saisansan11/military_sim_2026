@@ -10,11 +10,11 @@ class Prc624PartsScreen extends StatefulWidget {
 }
 
 class _Prc624PartsScreenState extends State<Prc624PartsScreen> {
-  // ✅ 1. ฐานข้อมูล (ใช้ลิ้งก์เต็มๆ เท่านั้น)
+  // --- 0. ฐานข้อมูลโมเดล (สำคัญ: ต้องใช้ assets/assets/ เหมือนรูปภาพ) ---
   final String _gh3DBase =
       "https://saisansan11.github.io/military_sim_2026/assets/assets/models/";
 
-  // ✅ 2. รายชื่อไฟล์ (ใส่แค่ชื่อไฟล์พอ ไม่ต้องมี assets/ นำหน้า)
+  // รายการชิ้นส่วน
   final List<Map<String, dynamic>> parts = [
     {'id': 'FULL', 'name': 'AN/PRC-624 (FULL)', 'file': 'prc624.glb'},
     {'id': 'RT-624', 'name': 'Receiver-Transmitter', 'file': 'body.glb'},
@@ -27,11 +27,8 @@ class _Prc624PartsScreenState extends State<Prc624PartsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ 3. สร้าง URL โดยเอาฐานข้อมูล + ชื่อไฟล์
+    // สร้าง URL เต็มรูปแบบ
     String currentModelUrl = "$_gh3DBase${parts[selectedIndex]['file']}";
-
-    // Debug: ปริ้นดูว่า URL ที่ได้คืออะไร
-    debugPrint("LOADING 3D URL: $currentModelUrl");
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -45,6 +42,7 @@ class _Prc624PartsScreenState extends State<Prc624PartsScreen> {
       ),
       body: Column(
         children: [
+          // ส่วนแสดงผล 3D
           Expanded(
             flex: 2,
             child: Container(
@@ -59,48 +57,105 @@ class _Prc624PartsScreenState extends State<Prc624PartsScreen> {
                 child: ModelViewer(
                   key: ValueKey(
                     currentModelUrl,
-                  ), // บังคับโหลดใหม่เมื่อเปลี่ยนไฟล์
-                  src: currentModelUrl, // ใส่ URL เต็ม
-                  alt: "3D Model",
+                  ), // ใส่ Key เพื่อให้รีเฟรชตอนเปลี่ยนโมเดล
+                  src:
+                      currentModelUrl, // ✅ ลิ้งก์ที่ถูกต้อง (assets/assets/...)
+                  alt: "A 3D model of ${parts[selectedIndex]['name']}",
                   ar: true,
                   autoRotate: true,
                   cameraControls: true,
                   backgroundColor: Colors.transparent,
+                  loading: Loading.eager,
                 ),
               ),
             ),
           ),
-          // ส่วนปุ่มกดด้านล่าง
+
+          // ส่วนควบคุมด้านล่าง
           Expanded(
             flex: 1,
             child: Container(
-              color: const Color(0xFF1E1E1E),
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.all(10),
-                children: parts.asMap().entries.map((entry) {
-                  int idx = entry.key;
-                  bool isSel = idx == selectedIndex;
-                  return Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: ChoiceChip(
-                      label: Text(
-                        entry.value['id'],
-                        style: GoogleFonts.blackOpsOne(),
-                      ),
-                      selected: isSel,
-                      selectedColor: const Color(0xFF00FF41),
-                      onSelected: (val) {
-                        if (val) setState(() => selectedIndex = idx);
-                      },
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "SPECIFICATIONS",
+                    style: GoogleFonts.blackOpsOne(
+                      color: Colors.white,
+                      fontSize: 14,
                     ),
-                  );
-                }).toList(),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _getSpecText(parts[selectedIndex]['id']),
+                      style: GoogleFonts.sarabun(
+                        color: const Color(0xFF00FF41),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  // ปุ่มเลือกชิ้นส่วน
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: parts.asMap().entries.map((entry) {
+                        int idx = entry.key;
+                        var part = entry.value;
+                        bool isSel = idx == selectedIndex;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(
+                              part['id'],
+                              style: GoogleFonts.blackOpsOne(),
+                            ),
+                            selected: isSel,
+                            selectedColor: const Color(0xFF00FF41),
+                            backgroundColor: const Color(0xFF333333),
+                            onSelected: (val) {
+                              if (val) setState(() => selectedIndex = idx);
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _getSpecText(String id) {
+    switch (id) {
+      case 'FULL':
+        return "• System: AN/PRC-624\n• Freq: 30-88 MHz\n• Weight: 960g";
+      case 'RT-624':
+        return "• Power: 1-2 Watts\n• Channels: 2,320\n• Protection: Waterproof";
+      case 'BASE':
+        return "• Connector: TNC Type\n• Material: Reinforced Polymer";
+      case 'WHIP':
+        return "• Length: 1.2m (Flexible)\n• Range: 3-5 km";
+      case 'BATT':
+        return "• Type: Li-ion 7.4V\n• Capacity: 24 Hours (Low Power)";
+      default:
+        return "N/A";
+    }
   }
 }
