@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+// ✅ เปลี่ยนชื่อ Class ให้เป็น Inspection3DScreen (เผื่อแอพเรียกอันนี้)
 class Inspection3DScreen extends StatefulWidget {
   const Inspection3DScreen({super.key});
 
@@ -10,100 +11,99 @@ class Inspection3DScreen extends StatefulWidget {
 }
 
 class _Inspection3DScreenState extends State<Inspection3DScreen> {
-  // สถานะการโชว์จุด Hotspot
-  bool showInternal = false;
+  // ✅ ใช้ assets 2 ชั้น (ถูกต้อง)
+  final String _gh3DBase =
+      "https://saisansan11.github.io/military_sim_2026/assets/assets/models/";
+
+  final List<Map<String, dynamic>> parts = [
+    {'id': 'FULL', 'name': 'AN/PRC-624 (FULL)', 'file': 'prc624.glb'},
+    {'id': 'RT-624', 'name': 'Receiver-Transmitter', 'file': 'body.glb'},
+    {'id': 'BASE', 'name': 'Antenna Base', 'file': 'antenna_base.glb'},
+    {'id': 'WHIP', 'name': 'Antenna Whip', 'file': 'antenna_whip.glb'},
+    {'id': 'BATT', 'name': 'Battery (BA-624)', 'file': 'battery.glb'},
+  ];
+
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    String currentModelUrl = "$_gh3DBase${parts[selectedIndex]['file']}";
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Color(0xFF00FF41),
-          ), // สีเขียวทหาร
-          onPressed: () => Navigator.pop(context),
-        ),
         title: Text(
-          "PART INSPECTION",
-          style: GoogleFonts.blackOpsOne(
-            color: const Color(0xFF00FF41),
-            letterSpacing: 1.5,
-          ),
+          "PART INSPECTION (V2)",
+          style: GoogleFonts.blackOpsOne(color: const Color(0xFF00FF41)),
         ),
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Color(0xFF00FF41)),
       ),
-      body: Stack(
+      body: Column(
         children: [
-          // 1. พื้นหลังตาราง Grid (สร้างบรรยากาศ Tech)
-          Positioned.fill(child: CustomPaint(painter: GridPainter())),
-
-          // 2. ตัวโชว์โมเดล 3D
-          Positioned.fill(
-            child: ModelViewer(
-              backgroundColor: Colors.transparent,
-              // *** เปลี่ยนชื่อไฟล์ตรงนี้ให้ตรงกับไฟล์ของท่าน ***
-              src: 'assets/models/prc624.glb',
-              alt: "A 3D model of PRC-624 Radio",
-              ar: true, // รองรับ AR (ถ้ามือถือไหว)
-              autoRotate: true, // ให้หมุนโชว์เองช้าๆ
-              disableZoom: false, // อนุญาตให้ซูมเข้าออก
-              cameraControls: true, // อนุญาตให้ใช้นิ้วหมุน
-            ),
-          ),
-
-          // 3. ปุ่ม Hotspot ลอย (จำลองการคลิกดูไส้ใน)
-          if (showInternal)
-            const Center(
-              child: Icon(
-                Icons.settings_input_component,
-                color: Colors.amber,
-                size: 50,
+          Expanded(
+            flex: 2,
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[800]!),
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.black,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: ModelViewer(
+                  key: ValueKey(currentModelUrl),
+                  src: currentModelUrl, // ✅ ลิ้งก์ถูกแน่นอน
+                  alt: "A 3D model",
+                  ar: true,
+                  autoRotate: true,
+                  cameraControls: true,
+                  backgroundColor: Colors.transparent,
+                  loading: Loading.eager,
+                ),
               ),
             ),
-
-          // 4. UI ควบคุมด้านล่าง
-          Positioned(
-            bottom: 30,
-            left: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "MODE: INSPECTION",
-                  style: GoogleFonts.vt323(
-                    color: const Color(0xFF00FF41),
-                    fontSize: 24,
-                  ),
-                ),
-                Text(
-                  "TARGET: PRC-624",
-                  style: GoogleFonts.vt323(
-                    color: const Color(0xFF00FF41),
-                    fontSize: 24,
-                  ),
-                ),
-              ],
-            ),
           ),
-
-          // ปุ่ม Toggle ดูภายใน
-          Positioned(
-            bottom: 30,
-            right: 20,
-            child: FloatingActionButton(
-              backgroundColor: const Color(0xFF00FF41).withOpacity(0.2),
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(color: Color(0xFF00FF41), width: 2),
-                borderRadius: BorderRadius.circular(10),
+          Expanded(
+            flex: 1,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
-              onPressed: () {
-                setState(() => showInternal = !showInternal);
-              },
-              child: Icon(
-                showInternal ? Icons.visibility_off : Icons.visibility,
-                color: const Color(0xFF00FF41),
+              child: Column(
+                children: [
+                  Text(
+                    "SELECT PART TO INSPECT",
+                    style: GoogleFonts.blackOpsOne(color: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: parts.asMap().entries.map((entry) {
+                        int idx = entry.key;
+                        bool isSel = idx == selectedIndex;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(
+                              entry.value['id'],
+                              style: GoogleFonts.blackOpsOne(),
+                            ),
+                            selected: isSel,
+                            selectedColor: const Color(0xFF00FF41),
+                            onSelected: (val) {
+                              if (val) setState(() => selectedIndex = idx);
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -111,28 +111,4 @@ class _Inspection3DScreenState extends State<Inspection3DScreen> {
       ),
     );
   }
-}
-
-// --- Class วาดตาราง Grid สีเขียวจางๆ ---
-class GridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF00FF41).withOpacity(0.15)
-      ..strokeWidth = 1;
-
-    double step = 40; // ระยะห่างช่องตาราง
-
-    // วาดเส้นตั้ง
-    for (double x = 0; x <= size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-    // วาดเส้นนอน
-    for (double y = 0; y <= size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
