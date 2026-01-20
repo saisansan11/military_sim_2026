@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:model_viewer_plus/model_viewer_plus.dart'; // ✅ อย่าลืม import ตัวนี้
 import 'dart:async';
 
 class Prc624Screen extends StatefulWidget {
@@ -12,20 +11,23 @@ class Prc624Screen extends StatefulWidget {
 }
 
 class _Prc624ScreenState extends State<Prc624Screen> {
-  // --- 0. ฐานข้อมูลโมเดล (GitHub URL) ---
-  // ✅ ระบุพิกัดที่ถูกต้อง (assets ซ้อน assets)
-  final String ghModelBase =
-      "https://saisansan11.github.io/military_sim_2026/assets/assets/models/";
-  final String ghSoundBase =
-      "https://saisansan11.github.io/military_sim_2026/assets/assets/sounds/";
+  // --- 0. พิกัดฐานข้อมูล (แก้ไขแล้ว) ---
+
+  // ✅ 1. แก้พิกัดรูปภาพ: ใส่ assets/assets/ ซ้อน 2 ชั้น ตามที่เจอในโฟลเดอร์
+  final String imgUrl =
+      "https://saisansan11.github.io/military_sim_2026/assets/assets/images/prc624_real.png";
+
+  // 2. พิกัดเสียง (อันนี้ถูกต้องแล้วครับ)
+  final String soundBase =
+      "https://saisansan11.github.io/military_sim_2026/assets/assets/";
 
   // --- 1. ระบบเสียง ---
   final AudioPlayer _staticPlayer = AudioPlayer();
   final AudioPlayer _effectPlayer = AudioPlayer();
 
-  final String soundSwitch = "switch.mp3";
-  final String soundBeep = "beep.mp3";
-  final String soundStatic = "static.mp3";
+  final String soundSwitch = "sounds/switch.mp3";
+  final String soundBeep = "sounds/beep.mp3";
+  final String soundStatic = "sounds/static.mp3";
 
   // --- 2. ตัวแปรสถานะเครื่อง ---
   String frequency = "45.500";
@@ -40,7 +42,6 @@ class _Prc624ScreenState extends State<Prc624Screen> {
   bool showCursor = true;
   Timer? _blinkTimer;
 
-  // ปิด Debug Mode
   final bool isDebugMode = false;
 
   @override
@@ -54,7 +55,7 @@ class _Prc624ScreenState extends State<Prc624Screen> {
 
   Future<void> _playLocalSound(
     AudioPlayer player,
-    String filename, {
+    String path, {
     bool loop = false,
   }) async {
     try {
@@ -63,8 +64,8 @@ class _Prc624ScreenState extends State<Prc624Screen> {
       } else {
         await player.setReleaseMode(ReleaseMode.stop);
       }
-      // ดึงเสียงจาก Web (GitHub)
-      await player.play(UrlSource("$ghSoundBase$filename"));
+      // ดึงเสียงจาก Base ที่ตั้งไว้
+      await player.play(UrlSource("$soundBase$path"));
     } catch (e) {
       debugPrint("Audio Error: $e");
     }
@@ -189,46 +190,43 @@ class _Prc624ScreenState extends State<Prc624Screen> {
               height: 750,
               child: Stack(
                 children: [
-                  // --- 1. 3D Model Viewer (พระเอกของเรา) ---
                   Positioned.fill(
-                    child: ModelViewer(
-                      // ✅ ใส่ลิงก์เต็มที่พิสูจน์แล้วว่าโหลดได้
-                      src: '${ghModelBase}prc624.glb',
-
-                      // ทางเลือก: ถ้าอยากดูแค่แบตเตอรี่ หรือ เสาอากาศ ให้แก้ชื่อไฟล์ตรงนี้
-                      // src: '${ghModelBase}battery.glb',
-                      alt: "AN/PRC-624 Radio",
-                      ar: false, // ปิด AR บนเว็บเพื่อความเสถียร
-                      autoRotate: false,
-                      cameraControls:
-                          false, // ปิดการหมุนด้วยนิ้ว (เพื่อให้กดปุ่มได้แม่นยำ)
-                      disableZoom: true,
-                      backgroundColor: Colors.transparent,
+                    child: Image.network(
+                      imgUrl,
+                      // ✅ แก้ไข: ใช้ BoxFit.fill เพื่อบังคับภาพให้ตรงบล็อก ไม่เลื่อน
+                      fit: BoxFit.fill,
+                      alignment: Alignment.center,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[900],
+                          child: const Center(
+                            child: Text(
+                              "Image Not Found\nCheck URL",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-
-                  // --- 2. จุดสัมผัส (Touch Points) ---
-                  // ปุ่มเปิด/ปิด (Volume Knob)
                   Positioned(
                     top: 20,
                     left: 25,
                     child: _buildKnobOverlay(size: 70, onTap: _togglePower),
                   ),
-                  // ปุ่มเลือกช่อง (Channel Knob)
                   Positioned(
                     top: 30,
                     right: 110,
                     child: _buildKnobOverlay(size: 65),
                   ),
-
-                  // --- 3. หน้าจอดิจิทัล (LCD Screen) ---
                   Positioned(
                     top: 395,
                     left: 105,
                     child: _buildRealScreen(width: 190, height: 50),
                   ),
 
-                  // --- 4. ปุ่มกด (Keypad) ---
+                  // ปุ่มกด 4 ปุ่ม
                   Positioned(
                     bottom: 140,
                     left: 45,
@@ -293,8 +291,6 @@ class _Prc624ScreenState extends State<Prc624Screen> {
           ),
         ),
       ),
-
-      // ปุ่ม PTT ด้านข้าง
       floatingActionButton: GestureDetector(
         onTapDown: (_) {
           if (isPowerOn) {
