@@ -15,6 +15,7 @@ class _Prc624TroubleScreenState extends State<Prc624TroubleScreen> {
   bool answered = false;
   bool isCorrect = false;
 
+  // ฐานข้อมูลโจทย์ปัญหา (เหมือนเดิม)
   final List<Map<String, dynamic>> scenarios = [
     {
       "symptom":
@@ -38,7 +39,7 @@ class _Prc624TroubleScreenState extends State<Prc624TroubleScreen> {
         "เสาอากาศผิดขนาด",
       ],
       "correctIndex": 2,
-      "hint": "ขั้วต่อที่สกปรกทำให้เกิดความต้านทานและสัญญาณ rบกวนในสายไมค์",
+      "hint": "ขั้วต่อที่สกปรกทำให้เกิดความต้านทานและสัญญาณรบกวนในสายไมค์",
     },
     {
       "symptom": "เครื่องร้อนจัดหลังจากกดส่งสัญญาณ (PTT) เพียงไม่กี่ครั้ง",
@@ -162,54 +163,78 @@ class _Prc624TroubleScreenState extends State<Prc624TroubleScreen> {
     String rank = totalScore >= 80
         ? "จ่าสื่อสารมือฉมัง"
         : (totalScore >= 50 ? "สิบตรีชำนาญการ" : "พลทหารฝึกหัด");
+
+    // เปลี่ยนสีตามยศ
+    Color rankColor = totalScore >= 80
+        ? const Color(0xFF00FF41)
+        : Colors.orange;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.black,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(color: rankColor, width: 2),
+        ),
         title: Text(
           "INSPECTION REPORT",
-          style: GoogleFonts.blackOpsOne(color: const Color(0xFF00FF41)),
+          style: GoogleFonts.blackOpsOne(color: Colors.white, fontSize: 24),
+          textAlign: TextAlign.center,
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const Divider(color: Colors.grey),
+            const SizedBox(height: 10),
             Text(
-              "คะแนนรวม: $totalScore / 100",
-              style: const TextStyle(color: Colors.white, fontSize: 20),
+              "$totalScore / 100",
+              style: GoogleFonts.blackOpsOne(color: rankColor, fontSize: 48),
             ),
             const SizedBox(height: 10),
             Text(
-              "ระดับความสามารถ: $rank",
-              style: const TextStyle(
-                color: Color(0xFF00FF41),
+              "ระดับความสามารถ:",
+              style: GoogleFonts.sarabun(color: Colors.white70),
+            ),
+            Text(
+              rank,
+              style: GoogleFonts.sarabun(
+                color: rankColor,
                 fontWeight: FontWeight.bold,
+                fontSize: 20,
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                currentScenarioIndex = 0;
-                totalScore = 0;
-                selectedAnswer = null;
-                answered = false;
-              });
-            },
-            child: const Text(
-              "RETAKE EXAM",
-              style: TextStyle(color: Colors.orange),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: const Text("EXIT", style: TextStyle(color: Colors.white)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                child: const Text("EXIT", style: TextStyle(color: Colors.grey)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    currentScenarioIndex = 0;
+                    totalScore = 0;
+                    selectedAnswer = null;
+                    answered = false;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: rankColor,
+                  foregroundColor: Colors.black,
+                ),
+                child: const Text("RETAKE EXAM"),
+              ),
+            ],
           ),
         ],
       ),
@@ -221,22 +246,33 @@ class _Prc624TroubleScreenState extends State<Prc624TroubleScreen> {
     final scenario = scenarios[currentScenarioIndex];
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(
           "TROUBLESHOOTING",
           style: GoogleFonts.blackOpsOne(color: const Color(0xFF00FF41)),
         ),
         backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Color(0xFF00FF41)),
         actions: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Center(
-              child: Text(
-                "SCORE: $totalScore",
-                style: GoogleFonts.blackOpsOne(
-                  fontSize: 14,
-                  color: Colors.white,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(color: const Color(0xFF00FF41)),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Text(
+                  "SCORE: $totalScore",
+                  style: GoogleFonts.blackOpsOne(
+                    fontSize: 14,
+                    color: const Color(0xFF00FF41),
+                  ),
                 ),
               ),
             ),
@@ -247,28 +283,59 @@ class _Prc624TroubleScreenState extends State<Prc624TroubleScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            LinearProgressIndicator(
-              value: (currentScenarioIndex + 1) / scenarios.length,
-              backgroundColor: Colors.grey[800],
-              color: const Color(0xFF00FF41),
+            // Progress Bar แบบ Sci-Fi
+            ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: LinearProgressIndicator(
+                value: (currentScenarioIndex + 1) / scenarios.length,
+                backgroundColor: Colors.grey[900],
+                color: const Color(0xFF00FF41),
+                minHeight: 10,
+              ),
             ),
+
             const SizedBox(height: 20),
+
+            // กล่องโจทย์ปัญหา (Theme Sci-Fi)
             Container(
-              padding: const EdgeInsets.all(16),
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: const Color(0xFF1E1E1E),
-                border: Border.all(color: Colors.orange, width: 2),
+                border: Border.all(
+                  color: Colors.cyanAccent.withOpacity(0.5),
+                  width: 1,
+                ),
                 borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.cyanAccent.withOpacity(0.1),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
               child: Column(
                 children: [
-                  const Icon(Icons.biotech, color: Colors.orange, size: 30),
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.orange,
+                    size: 40,
+                  ),
                   const SizedBox(height: 10),
+                  Text(
+                    "SYMPTOM DETECTED:",
+                    style: GoogleFonts.blackOpsOne(
+                      color: Colors.orange,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
                   Text(
                     scenario['symptom'],
                     textAlign: TextAlign.center,
                     style: GoogleFonts.sarabun(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -276,7 +343,10 @@ class _Prc624TroubleScreenState extends State<Prc624TroubleScreen> {
                 ],
               ),
             ),
+
             const SizedBox(height: 20),
+
+            // รายการตัวเลือก
             Expanded(
               child: ListView.builder(
                 itemCount: scenario['options'].length,
@@ -284,31 +354,69 @@ class _Prc624TroubleScreenState extends State<Prc624TroubleScreen> {
                   bool isSelected = selectedAnswer == index;
                   bool isCorrectAnswer = scenario['correctIndex'] == index;
 
-                  Color borderColor = Colors.grey[700]!;
+                  Color borderColor = Colors.grey[800]!;
+                  Color bgColor = const Color(0xFF111111);
+                  IconData? icon;
+
                   if (answered) {
                     if (isCorrectAnswer) {
-                      borderColor = Colors.green;
-                    } else if (isSelected)
+                      borderColor = const Color(0xFF00FF41);
+                      bgColor = const Color(0xFF003300);
+                      icon = Icons.check_circle;
+                    } else if (isSelected) {
                       borderColor = Colors.red;
+                      bgColor = const Color(0xFF330000);
+                      icon = Icons.cancel;
+                    }
+                  } else if (isSelected) {
+                    borderColor = Colors.cyanAccent;
                   }
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: InkWell(
                       onTap: () => checkAnswer(index),
+                      borderRadius: BorderRadius.circular(8),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.black
-                              : const Color(0xFF1E1E1E),
-                          border: Border.all(color: borderColor, width: 2),
+                          color: bgColor,
+                          border: Border.all(
+                            color: borderColor,
+                            width: isSelected || (answered && isCorrectAnswer)
+                                ? 2
+                                : 1,
+                          ),
                           borderRadius: BorderRadius.circular(8),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: borderColor.withOpacity(0.3),
+                                    blurRadius: 8,
+                                  ),
+                                ]
+                              : [],
                         ),
-                        child: Text(
-                          scenario['options'][index],
-                          style: GoogleFonts.sarabun(color: Colors.white),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                scenario['options'][index],
+                                style: GoogleFonts.sarabun(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                            if (icon != null) ...[
+                              const SizedBox(width: 10),
+                              Icon(icon, color: borderColor),
+                            ],
+                          ],
                         ),
                       ),
                     ),
@@ -316,35 +424,57 @@ class _Prc624TroubleScreenState extends State<Prc624TroubleScreen> {
                 },
               ),
             ),
+
+            // ส่วนแสดงผลเมื่อตอบแล้ว (เฉลย/ปุ่มถัดไป)
             if (answered) ...[
               Container(
+                width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[800]!),
                 ),
-                child: Text(
-                  "💡 คำแนะนำ: ${scenario['hint']}",
-                  style: GoogleFonts.sarabun(
-                    color: Colors.orange[300],
-                    fontSize: 13,
-                  ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.lightbulb_outline,
+                      color: Colors.yellow,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        scenario['hint'],
+                        style: GoogleFonts.sarabun(
+                          color: Colors.yellow[200],
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
+                height: 55,
+                child: ElevatedButton.icon(
                   onPressed: nextScenario,
+                  icon: const Icon(Icons.arrow_forward),
+                  label: Text(
+                    currentScenarioIndex < scenarios.length - 1
+                        ? "NEXT SCENARIO"
+                        : "VIEW FINAL REPORT",
+                    style: GoogleFonts.blackOpsOne(fontSize: 18),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF00FF41),
-                  ),
-                  child: Text(
-                    currentScenarioIndex < scenarios.length - 1
-                        ? "NEXT STEP"
-                        : "VIEW RESULTS",
-                    style: GoogleFonts.blackOpsOne(color: Colors.black),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ),

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-// Import ไฟล์เมนูทั้งสองรุ่น
-import 'prc624_menu.dart'; // เมนูเดิมของ 624
-import 'prc710_details.dart'; // หน้าใหม่ของ 710
+
+// Import หน้าเมนูของทั้ง 2 รุ่น
+import 'prc624_menu.dart';
+import 'prc710_menu.dart'; // ✅ นำเข้าเมนู 710 (ถูกต้อง)
 
 void main() => runApp(const MilitarySimApp());
 
@@ -38,9 +39,8 @@ class MainSelectorScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // 1. ปุ่ม AN/PRC-624 (แก้ไขให้กดได้แล้วครับ ✅)
+            // 1. ปุ่ม AN/PRC-624
             _buildRadioBtn(context, "AN/PRC-624", "Handheld VHF/FM Radio", () {
-              // เชื่อมโยงไปหน้าเมนู 624 เดิม
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -50,13 +50,14 @@ class MainSelectorScreen extends StatelessWidget {
             }),
             const SizedBox(height: 16),
 
-            // 2. ปุ่ม AN/PRC-710 (ใหม่)
+            // 2. ปุ่ม AN/PRC-710 (✅ แก้ไขแล้ว: ไปหน้าเมนูรวมก่อน)
             _buildRadioBtn(context, "AN/PRC-710", "Tactical Digital Radio", () {
-              // เชื่อมโยงไปหน้า 710 ใหม่
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const Prc710DetailScreen(),
+                  // ❌ ของเก่า: const Prc710DetailScreen() <-- ผิด
+                  // ✅ ของใหม่: ไปหน้าเมนูที่มี 4 ปุ่ม
+                  builder: (context) => const Prc710MenuScreen(),
                 ),
               );
             }),
@@ -76,7 +77,7 @@ class MainSelectorScreen extends StatelessWidget {
     );
   }
 
-  // Widget สร้างปุ่มกด (ดีไซน์เดิม)
+  // Widget สร้างปุ่มกด
   Widget _buildRadioBtn(
     BuildContext context,
     String title,

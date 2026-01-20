@@ -10,22 +10,20 @@ class Prc624DetailScreen extends StatefulWidget {
 }
 
 class _Prc624DetailScreenState extends State<Prc624DetailScreen> {
-  // ✅ 3D Model Path (ถูกต้อง)
+  // ✅ 3D Model Path
   final String _gh3DBase =
       "https://saisansan11.github.io/military_sim_2026/assets/assets/models/";
 
   final List<Map<String, dynamic>> parts = [
     {'id': 'FULL', 'name': 'AN/PRC-624 (FULL SYSTEM)', 'file': 'prc624.glb'},
     {'id': 'RT-624', 'name': 'Receiver-Transmitter', 'file': 'body.glb'},
-    {
-      'id': 'ANTENNA',
-      'name': 'Antenna System',
-      'file': 'antenna_whip.glb',
-    }, // รวมเสาและฐาน
+    {'id': 'BASE', 'name': 'Antenna Base', 'file': 'antenna_base.glb'},
+    {'id': 'WHIP', 'name': 'Antenna Whip', 'file': 'antenna_whip.glb'},
     {'id': 'BATTERY', 'name': 'Battery Pack (BA-624)', 'file': 'battery.glb'},
   ];
 
   int selectedIndex = 0;
+  String status = "PENDING"; // สถานะการตรวจเช็ค
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +33,7 @@ class _Prc624DetailScreenState extends State<Prc624DetailScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(
-          "SPECIFICATIONS & 3D",
+          "PART INSPECTION", // เปลี่ยนชื่อกลับเป็น Inspection ตามที่ต้องการ
           style: GoogleFonts.blackOpsOne(color: const Color(0xFF00FF41)),
         ),
         backgroundColor: Colors.black,
@@ -43,20 +41,32 @@ class _Prc624DetailScreenState extends State<Prc624DetailScreen> {
       ),
       body: Column(
         children: [
-          // --- ส่วนแสดงผล 3D (60% ของหน้าจอ) ---
+          // --- ส่วนแสดงผล 3D (55% ของหน้าจอ) ---
           Expanded(
-            flex: 6,
+            flex: 55,
             child: Container(
-              margin: const EdgeInsets.all(16),
+              margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey[800]!),
+                border: Border.all(
+                  color: Colors.cyanAccent.withOpacity(0.7),
+                  width: 2,
+                ),
                 borderRadius: BorderRadius.circular(12),
-                color: Colors.black,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white,
+                    Colors.cyan.shade50,
+                    Colors.blueGrey.shade50,
+                  ],
+                  stops: const [0.1, 0.5, 0.9],
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF00FF41).withOpacity(0.1),
-                    blurRadius: 10,
-                    spreadRadius: 1,
+                    color: Colors.cyanAccent.withOpacity(0.3),
+                    blurRadius: 20,
+                    spreadRadius: 2,
                   ),
                 ],
               ),
@@ -74,7 +84,8 @@ class _Prc624DetailScreenState extends State<Prc624DetailScreen> {
                       backgroundColor: Colors.transparent,
                       loading: Loading.eager,
                     ),
-                    // ป้ายชื่อชิ้นส่วนมุมขวาบน
+
+                    // 1. ป้ายชื่อชิ้นส่วน (ขวาบน)
                     Positioned(
                       top: 10,
                       right: 10,
@@ -84,7 +95,7 @@ class _Prc624DetailScreenState extends State<Prc624DetailScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
+                          color: Colors.black.withOpacity(0.8),
                           border: Border.all(color: const Color(0xFF00FF41)),
                           borderRadius: BorderRadius.circular(4),
                         ),
@@ -97,49 +108,89 @@ class _Prc624DetailScreenState extends State<Prc624DetailScreen> {
                         ),
                       ),
                     ),
+
+                    // 2. ป้ายสถานะ STATUS (ซ้ายบน) - คืนชีพกลับมาแล้ว!
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          border: Border.all(
+                            color: status == "PASS"
+                                ? Colors.green
+                                : status == "FAIL"
+                                ? Colors.red
+                                : Colors.white,
+                          ),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              status == "PASS"
+                                  ? Icons.check_circle
+                                  : status == "FAIL"
+                                  ? Icons.cancel
+                                  : Icons.help_outline,
+                              color: status == "PASS"
+                                  ? Colors.green
+                                  : status == "FAIL"
+                                  ? Colors.red
+                                  : Colors.white,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              "STATUS: $status",
+                              style: GoogleFonts.blackOpsOne(
+                                color: status == "PASS"
+                                    ? Colors.green
+                                    : status == "FAIL"
+                                    ? Colors.red
+                                    : Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
 
-          // --- ส่วนข้อมูล (40% ของหน้าจอ) ---
+          // --- ส่วนข้อมูลและปุ่ม (45% ของหน้าจอ) ---
           Expanded(
-            flex: 4,
+            flex: 45,
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
                 color: Color(0xFF1E1E1E),
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black54,
-                    blurRadius: 10,
-                    offset: Offset(0, -5),
-                  ),
-                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // หัวข้อ
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "TECHNICAL DATA",
-                        style: GoogleFonts.blackOpsOne(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Icon(Icons.data_usage, color: const Color(0xFF00FF41)),
-                    ],
+                  Text(
+                    "SPECIFICATIONS",
+                    style: GoogleFonts.blackOpsOne(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
 
-                  // กล่องข้อความสเปค (Scrollable)
+                  // กล่องข้อความสเปค
                   Expanded(
                     child: Container(
                       width: double.infinity,
@@ -162,29 +213,24 @@ class _Prc624DetailScreenState extends State<Prc624DetailScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 12),
 
-                  // ปุ่มเลือกชิ้นส่วน
+                  // ปุ่มเลือกชิ้นส่วน (Choice Chips)
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: parts.asMap().entries.map((entry) {
                         int idx = entry.key;
                         return Padding(
-                          padding: const EdgeInsets.only(right: 10),
+                          padding: const EdgeInsets.only(right: 8),
                           child: ChoiceChip(
                             label: Text(
                               entry.value['id'],
-                              style: GoogleFonts.blackOpsOne(),
+                              style: GoogleFonts.blackOpsOne(fontSize: 12),
                             ),
                             selected: idx == selectedIndex,
                             selectedColor: const Color(0xFF00FF41),
                             backgroundColor: const Color(0xFF333333),
-                            labelStyle: TextStyle(
-                              color: idx == selectedIndex
-                                  ? Colors.black
-                                  : Colors.white,
-                            ),
                             onSelected: (val) {
                               if (val) setState(() => selectedIndex = idx);
                             },
@@ -192,6 +238,45 @@ class _Prc624DetailScreenState extends State<Prc624DetailScreen> {
                         );
                       }).toList(),
                     ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // 3. ปุ่ม FAIL / PASS - คืนชีพกลับมาแล้ว!
+                  Row(
+                    children: [
+                      // ปุ่ม FAIL
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            setState(() => status = "FAIL");
+                          },
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          label: Text("FAIL", style: GoogleFonts.blackOpsOne()),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red[900],
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      // ปุ่ม PASS
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            setState(() => status = "PASS");
+                          },
+                          icon: const Icon(Icons.check, color: Colors.white),
+                          label: Text("PASS", style: GoogleFonts.blackOpsOne()),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green[800],
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -202,35 +287,19 @@ class _Prc624DetailScreenState extends State<Prc624DetailScreen> {
     );
   }
 
-  // ข้อมูลสเปคแบบเต็ม (ตามภาพที่ผู้หมวดเคยส่งมา)
+  // ข้อมูลสเปค
   String _getFullSpecText(String id) {
     switch (id) {
       case 'FULL':
-        return """• ประเภท: วิทยุรับ-ส่ง มือถือ ย่าน VHF/FM
-• ย่านความถี่: 30.000 - 87.975 MHz
-• จำนวนช่อง: 2,320 ช่อง (ระยะห่าง 25 kHz)
-• กำลังส่ง: High (2 วัตต์) / Low (1 วัตต์)
-• ระยะหวังผล: 3-5 กม. (ขึ้นอยู่กับภูมิประเทศ)
-• น้ำหนัก: ประมาณ 960 กรัม (รวมแบตเตอรี่)
-• อุณหภูมิใช้งาน: -20°C ถึง +60°C""";
+        return "• ประเภท: วิทยุรับ-ส่ง มือถือ ย่าน VHF/FM\n• ย่านความถี่: 30.000 - 87.975 MHz\n• จำนวนช่อง: 2,320 ช่อง\n• กำลังส่ง: 1-2 วัตต์\n• ระยะหวังผล: 3-5 กม.";
       case 'RT-624':
-        return """• รุ่น: Receiver-Transmitter RT-624
-• ระบบป้องกัน: กันน้ำลึก 1 เมตร (30 นาที)
-• จอแสดงผล: LCD พร้อมไฟ Backlight (สีเขียว)
-• การควบคุม: ปุ่มกดหน้าเครื่อง 4 ปุ่ม
-• การเชื่อมต่อ: ขั้วต่อเสาอากาศแบบ TNC, ขั้วต่อ Audio 6-pin""";
-      case 'ANTENNA':
-        return """• ประเภท: เสาอากาศยาง (Flexible Whip)
-• ความยาว: ประมาณ 1.2 เมตร
-• ย่านความถี่: Broadband 30-88 MHz
-• ขั้วต่อ: TNC Type (เกลียว)
-• Matching Unit: ฐานเสาแบบมีวงจรแมทชิ่งในตัว""";
+        return "• รุ่น: RT-624\n• ระบบป้องกัน: กันน้ำลึก 1 เมตร\n• จอแสดงผล: LCD Backlight\n• การควบคุม: ปุ่มกด 4 ปุ่ม";
+      case 'BASE':
+        return "• ชื่อ: Antenna Base\n• การติดตั้ง: ติดบนเครื่อง RT-624\n• ขั้วต่อ: TNC Type\n• วัสดุ: Reinforced Polymer";
+      case 'WHIP':
+        return "• ชื่อ: Antenna Whip\n• ความยาว: 1.2 เมตร\n• ย่านความถี่: Broadband 30-88 MHz\n• ข้อควรระวัง: ห้ามพับงอจนหัก";
       case 'BATTERY':
-        return """• รุ่น: BA-624 (แบตเตอรี่แพ็ค)
-• ชนิด: Nickel-Cadmium (Ni-Cd) หรือ Li-ion
-• แรงดันไฟ: 7.4 VDC
-• ความจุ: ใช้งานต่อเนื่องได้นานกว่า 10 ชั่วโมง (อัตราส่วน 1:1:8)
-• การชาร์จ: รองรับแท่นชาร์จเร็ว""";
+        return "• รุ่น: BA-624\n• ชนิด: Ni-Cd หรือ Li-ion\n• แรงดันไฟ: 7.4 VDC\n• ความจุ: ใช้งานได้ >10 ชม.";
       default:
         return "N/A";
     }
