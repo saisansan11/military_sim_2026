@@ -10,7 +10,7 @@ class Prc624PartsScreen extends StatefulWidget {
 }
 
 class _Prc624PartsScreenState extends State<Prc624PartsScreen> {
-  // --- 0. ฐานข้อมูลโมเดล (สำคัญ: ต้องใช้ assets/assets/ เหมือนรูปภาพ) ---
+  // --- 0. ฐานข้อมูลโมเดล (Verified: ใช้ assets/assets/ ถูกต้องแล้วครับ) ---
   final String _gh3DBase =
       "https://saisansan11.github.io/military_sim_2026/assets/assets/models/";
 
@@ -55,11 +55,9 @@ class _Prc624PartsScreenState extends State<Prc624PartsScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: ModelViewer(
-                  key: ValueKey(
-                    currentModelUrl,
-                  ), // ใส่ Key เพื่อให้รีเฟรชตอนเปลี่ยนโมเดล
-                  src:
-                      currentModelUrl, // ✅ ลิ้งก์ที่ถูกต้อง (assets/assets/...)
+                  // ✅ ใส่ Key สำคัญมาก เพื่อให้มันรู้ว่าต้องโหลดใหม่เมื่อเปลี่ยนชิ้นส่วน
+                  key: ValueKey(currentModelUrl),
+                  src: currentModelUrl, // ✅ ลิ้งก์ถูกต้อง 100%
                   alt: "A 3D model of ${parts[selectedIndex]['name']}",
                   ar: true,
                   autoRotate: true,
