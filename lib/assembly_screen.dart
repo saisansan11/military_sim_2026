@@ -130,10 +130,10 @@ class _AssemblyScreenState extends State<AssemblyScreen> {
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(12),
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Colors.black, const Color(0xFF001100), Colors.black],
+                  colors: [Colors.black, Color(0xFF001100), Colors.black],
                 ),
               ),
               child: ClipRRect(
@@ -249,8 +249,8 @@ class _AssemblyScreenState extends State<AssemblyScreen> {
                               feedbackColor == Colors.red
                                   ? Icons.cancel
                                   : feedbackColor == const Color(0xFF00FF41)
-                                  ? Icons.check_circle
-                                  : Icons.info_outline,
+                                      ? Icons.check_circle
+                                      : Icons.info_outline,
                               color: feedbackColor,
                               size: 16,
                             ),
@@ -270,9 +270,7 @@ class _AssemblyScreenState extends State<AssemblyScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 12),
-
                   Expanded(
                     child: isCompleted
                         ? Center(

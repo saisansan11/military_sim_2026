@@ -55,10 +55,10 @@ class _Prc710DetailScreenState extends State<Prc710DetailScreen> {
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(12),
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Colors.black, const Color(0xFF001100), Colors.black],
+                  colors: [Colors.black, Color(0xFF001100), Colors.black],
                 ),
                 boxShadow: [
                   BoxShadow(

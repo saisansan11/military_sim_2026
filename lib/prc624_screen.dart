@@ -323,9 +323,9 @@ class _Prc624ScreenState extends State<Prc624Screen> {
               ),
             ],
           ),
-          child: Column(
+          child: const Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               Icon(Icons.mic, color: Colors.white, size: 30),
               Text(
                 "PTT",
@@ -368,28 +368,28 @@ class _Prc624ScreenState extends State<Prc624Screen> {
                     .asMap()
                     .entries
                     .map((entry) {
-                      int idx = entry.key;
-                      String char = entry.value;
-                      bool isCursorPos = isEditing && idx == editIndex;
-                      Color charColor = Colors.black.withOpacity(0.9);
-                      if (isCursorPos && !showCursor) {
-                        charColor = Colors.transparent;
-                      }
-                      Color bgColor = Colors.transparent;
-                      if (isCursorPos) bgColor = Colors.black.withOpacity(0.1);
-                      return Container(
-                        color: bgColor,
-                        padding: const EdgeInsets.symmetric(horizontal: 1),
-                        child: Text(
-                          char,
-                          style: GoogleFonts.vt323(
-                            fontSize: height * 0.9,
-                            color: charColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      );
-                    }),
+                  int idx = entry.key;
+                  String char = entry.value;
+                  bool isCursorPos = isEditing && idx == editIndex;
+                  Color charColor = Colors.black.withOpacity(0.9);
+                  if (isCursorPos && !showCursor) {
+                    charColor = Colors.transparent;
+                  }
+                  Color bgColor = Colors.transparent;
+                  if (isCursorPos) bgColor = Colors.black.withOpacity(0.1);
+                  return Container(
+                    color: bgColor,
+                    padding: const EdgeInsets.symmetric(horizontal: 1),
+                    child: Text(
+                      char,
+                      style: GoogleFonts.vt323(
+                        fontSize: height * 0.9,
+                        color: charColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                }),
               ],
             )
           : const SizedBox(),
@@ -423,9 +423,8 @@ class _Prc624ScreenState extends State<Prc624Screen> {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: isDebugMode
-              ? Colors.blue.withOpacity(0.3)
-              : Colors.transparent,
+          color:
+              isDebugMode ? Colors.blue.withOpacity(0.3) : Colors.transparent,
           border: isDebugMode ? Border.all(color: Colors.blue, width: 2) : null,
         ),
       ),
